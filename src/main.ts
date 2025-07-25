@@ -8,7 +8,7 @@ import * as session from 'express-session';
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
 
- 
+
   app.enableCors({
     origin: [
       'https://front-pied-two.vercel.app',
@@ -18,7 +18,6 @@ async function bootstrap(): Promise<void> {
     credentials: true,
     allowedHeaders: 'Content-Type,Authorization',
   });
-
 
   const config = new DocumentBuilder()
     .setTitle('Users API')
@@ -31,15 +30,8 @@ async function bootstrap(): Promise<void> {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  // Middleware
-  app.use(cookieParser());
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-    }),
-  );
 
+  app.use(cookieParser());
 
   app.use(
     session({
@@ -52,6 +44,13 @@ async function bootstrap(): Promise<void> {
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', 
         maxAge: 24 * 60 * 60 * 1000,
       },
+    }),
+  );
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
     }),
   );
 
