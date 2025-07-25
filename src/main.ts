@@ -8,18 +8,18 @@ import * as session from 'express-session';
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
 
-  // Настройка CORS должна быть в начале, перед другими middleware
+ 
   app.enableCors({
     origin: [
       'https://front-pied-two.vercel.app',
-      'http://localhost:5173'              
+      'http://localhost:5173',
     ],
     methods: 'GET,POST,PUT,DELETE,OPTIONS',
-    credentials: true, 
+    credentials: true,
     allowedHeaders: 'Content-Type,Authorization',
   });
 
-  // Swagger документация
+
   const config = new DocumentBuilder()
     .setTitle('Users API')
     .setDescription('t1 camp form api')
@@ -27,20 +27,20 @@ async function bootstrap(): Promise<void> {
     .addBasicAuth()
     .addTag('users')
     .build();
-  
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
   // Middleware
   app.use(cookieParser());
   app.useGlobalPipes(
-    new ValidationPipe({ 
-      whitelist: true, 
-      forbidNonWhitelisted: true 
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
     }),
   );
 
-  // Сессии
+
   app.use(
     session({
       secret: 't1_camp_js',
@@ -48,8 +48,8 @@ async function bootstrap(): Promise<void> {
       saveUninitialized: false,
       cookie: {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production', // В продакшене должно быть true
-        sameSite: 'strict',
+        secure: process.env.NODE_ENV === 'production', 
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', 
         maxAge: 24 * 60 * 60 * 1000,
       },
     }),
